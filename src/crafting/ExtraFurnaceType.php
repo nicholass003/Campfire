@@ -38,9 +38,9 @@ use function spl_object_id;
  */
 
 enum ExtraFurnaceType{
-    use LegacyEnumShimTrait;
+	use LegacyEnumShimTrait;
 
-    case CAMPFIRE;
+	case CAMPFIRE;
 
 	/**
 	 * @phpstan-return TMetadata
@@ -48,9 +48,9 @@ enum ExtraFurnaceType{
 	private function getMetadata() : array{
 		/** @phpstan-var array<int, TMetadata> $cache */
 		static $cache = [];
-
+		
 		return $cache[spl_object_id($this)] ??= match($this){
-            self::CAMPFIRE => [600, new CampfireSound()]
+			self::CAMPFIRE => [600, new CampfireSound()]
 		};
 	}
 
