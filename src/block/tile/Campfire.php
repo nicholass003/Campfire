@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * Copyright (c) 2024 - present nicholass003
  *        _      _           _                ___   ___ ____
  *       (_)    | |         | |              / _ \ / _ \___ \
@@ -17,6 +17,7 @@
  * @author  nicholass003
  * @link    https://github.com/nicholass003/
  *
+ *
  */
 
 declare(strict_types=1);
@@ -28,17 +29,17 @@ use pocketmine\nbt\tag\CompoundTag;
 
 class Campfire extends Spawnable{
 
-    public const TAG_ITEMS = "Items"; //TAG_Compound
+	public const TAG_ITEMS = "Items"; //TAG_Compound
 
-    public function readSaveData(CompoundTag $nbt) : void{
+	public function readSaveData(CompoundTag $nbt) : void{
 
-    }
+	}
 
-    protected function writeSaveData(CompoundTag $nbt) : void{
+	protected function writeSaveData(CompoundTag $nbt) : void{
 
-    }
+	}
 
-    protected function addAdditionalSpawnData(CompoundTag $nbt) : void{
+	protected function addAdditionalSpawnData(CompoundTag $nbt) : void{
 
-    }
+	}
 }

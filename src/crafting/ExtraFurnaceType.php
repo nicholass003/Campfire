@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * Copyright (c) 2024 - present nicholass003
  *        _      _           _                ___   ___ ____
  *       (_)    | |         | |              / _ \ / _ \___ \
@@ -17,6 +17,7 @@
  * @author  nicholass003
  * @link    https://github.com/nicholass003/
  *
+ *
  */
 
 declare(strict_types=1);
@@ -32,7 +33,7 @@ use function spl_object_id;
  * TODO: These tags need to be removed once we get rid of LegacyEnumShimTrait (PM6)
  *  These are retained for backwards compatibility only.
  *
- * @method static FurnaceType CAMPFIRE()
+ * @method static ExtraFurnaceType CAMPFIRE()
  *
  * @phpstan-type TMetadata array{0: int, 1: Sound}
  */
@@ -48,7 +49,7 @@ enum ExtraFurnaceType{
 	private function getMetadata() : array{
 		/** @phpstan-var array<int, TMetadata> $cache */
 		static $cache = [];
-		
+
 		return $cache[spl_object_id($this)] ??= match($this){
 			self::CAMPFIRE => [600, new CampfireSound()]
 		};

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * Copyright (c) 2024 - present nicholass003
  *        _      _           _                ___   ___ ____
  *       (_)    | |         | |              / _ \ / _ \___ \
@@ -17,6 +17,7 @@
  * @author  nicholass003
  * @link    https://github.com/nicholass003/
  *
+ *
  */
 
 declare(strict_types=1);
@@ -30,7 +31,7 @@ use pocketmine\world\sound\Sound;
 
 class CampfireSound implements Sound{
 
-    public function encode(Vector3 $pos) : array{
-        return [LevelSoundEventPacket::nonActorSound(LevelSoundEvent::BLOCK_CAMPFIRE_CRACKLE, $pos, false)];
-    }
+	public function encode(Vector3 $pos) : array{
+		return [LevelSoundEventPacket::nonActorSound(LevelSoundEvent::BLOCK_CAMPFIRE_CRACKLE, $pos, false)];
+	}
 }

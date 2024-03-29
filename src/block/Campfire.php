@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * Copyright (c) 2024 - present nicholass003
  *        _      _           _                ___   ___ ____
  *       (_)    | |         | |              / _ \ / _ \___ \
@@ -17,14 +17,49 @@
  * @author  nicholass003
  * @link    https://github.com/nicholass003/
  *
+ *
  */
 
 declare(strict_types=1);
 
 namespace nicholass003\block;
 
-use pocketmine\block\Block;
+use nicholass003\campfire\crafting\ExtraFurnaceType;
+use pocketmine\block\BlockIdentifier;
+use pocketmine\block\BlockTypeInfo;
+use pocketmine\block\Transparent;
+use pocketmine\block\utils\FacesOppositePlacingPlayerTrait;
+use pocketmine\block\utils\LightableTrait;
+use pocketmine\data\runtime\RuntimeDataDescriber;
+use pocketmine\item\Item;
+use pocketmine\math\Vector3;
+use pocketmine\player\Player;
 
-class Campfire extends Block{
-    
+class Campfire extends Transparent{
+	use FacesOppositePlacingPlayerTrait;
+	use LightableTrait;
+
+	protected ExtraFurnaceType $furnaceType;
+
+	public function __construct(BlockIdentifier $idInfo, string $name, BlockTypeInfo $typeInfo, ExtraFurnaceType $furnaceType){
+		$this->furnaceType = $furnaceType;
+		parent::__construct($idInfo, $name, $typeInfo);
+	}
+
+	protected function describeBlockOnlyState(RuntimeDataDescriber $w) : void{
+		$w->horizontalFacing($this->facing);
+		$w->bool($this->lit);
+	}
+
+	public function getFurnaceType() : ExtraFurnaceType{
+		return $this->furnaceType;
+	}
+
+	public function getLightLevel() : int{
+		return $this->lit ? 15 : 0;
+	}
+
+	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null, array &$returnedItems = []) : bool{
+		return true;
+	}
 }
