@@ -22,10 +22,10 @@
 
 declare(strict_types=1);
 
-namespace nicholass003\block;
+namespace nicholass003\campfire\block;
 
-use nicholass003\block\tile\Campfire as TileCampfire;
-use nicholass003\campfire\crafting\ExtraFurnaceType;
+use nicholass003\campfire\block\tile\Campfire as TileCampfire;
+use nicholass003\campfire\block\Campfire;
 use pocketmine\block\Block;
 use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockIdentifier;
@@ -40,7 +40,7 @@ use pocketmine\utils\CloningRegistryTrait;
  * @see build/generate-registry-annotations.php
  * @generate-registry-docblock
  *
- * @method static  TARGET()
+ * @method static Campfire CAMPFIRE()
  */
 
 final class ExtraVanillaBlocks{
@@ -63,6 +63,6 @@ final class ExtraVanillaBlocks{
 
 	protected static function setup() : void{
 		$newId = BlockTypeIds::newId();
-		self::register("campfire", new Campfire(new BlockIdentifier($newId, TileCampfire::class), "Campfire", new BlockTypeInfo(BlockBreakInfo::axe(2.0, ToolTier::WOOD)), ExtraFurnaceType::CAMPFIRE()));
+		self::register("campfire", new Campfire(new BlockIdentifier($newId, TileCampfire::class), "Campfire", new BlockTypeInfo(BlockBreakInfo::axe(2.0, ToolTier::WOOD))));
 	}
 }

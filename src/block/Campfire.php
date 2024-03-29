@@ -22,44 +22,73 @@
 
 declare(strict_types=1);
 
-namespace nicholass003\block;
+namespace nicholass003\campfire\block;
 
-use nicholass003\campfire\crafting\ExtraFurnaceType;
+use nicholass003\campfire\block\tile\Campfire as TileCampfire;
+use nicholass003\campfire\block\utils\ExtinguishTrait;
+use nicholass003\campfire\sound\CampfireSound;
+use nicholass003\campfire\utils\CampfireFurnaceRecipe;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockTypeInfo;
 use pocketmine\block\Transparent;
 use pocketmine\block\utils\FacesOppositePlacingPlayerTrait;
-use pocketmine\block\utils\LightableTrait;
 use pocketmine\data\runtime\RuntimeDataDescriber;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\sound\ItemFrameAddItemSound;
 
 class Campfire extends Transparent{
 	use FacesOppositePlacingPlayerTrait;
-	use LightableTrait;
+	use ExtinguishTrait;
 
-	protected ExtraFurnaceType $furnaceType;
-
-	public function __construct(BlockIdentifier $idInfo, string $name, BlockTypeInfo $typeInfo, ExtraFurnaceType $furnaceType){
-		$this->furnaceType = $furnaceType;
+	public function __construct(BlockIdentifier $idInfo, string $name, BlockTypeInfo $typeInfo){
 		parent::__construct($idInfo, $name, $typeInfo);
 	}
 
 	protected function describeBlockOnlyState(RuntimeDataDescriber $w) : void{
 		$w->horizontalFacing($this->facing);
-		$w->bool($this->lit);
-	}
-
-	public function getFurnaceType() : ExtraFurnaceType{
-		return $this->furnaceType;
+		$w->bool($this->extinguished);
 	}
 
 	public function getLightLevel() : int{
-		return $this->lit ? 15 : 0;
+		return $this->extinguished ? 15 : 0;
+	}
+
+	public function getDrops(Item $item) : array{
+		$tile = $this->position->getWorld()->getTile($this->position);
+		$drops = [];
+		if($tile instanceof TileCampfire){
+			foreach($tile->getItemCookQueue() as $slot => $id){
+				$item = CampfireFurnaceRecipe::matchItemDrop($id);
+				if($item !== null){
+					$drops[] = $item;
+				}
+			}
+		}
+		return $drops;
 	}
 
 	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null, array &$returnedItems = []) : bool{
+		$tile = $this->position->getWorld()->getTile($this->position);
+		if($tile instanceof TileCampfire){
+			if($tile->canCook($item)){
+				$cook = $tile->addItemCookQueue($item);
+				if($cook === false){
+					return false;
+				}
+				$item->pop();
+				$this->position->getWorld()->addSound($clickVector, new ItemFrameAddItemSound());
+			}
+		}
 		return true;
+	}
+
+	public function onScheduledUpdate() : void{
+		$world = $this->position->getWorld();
+		$tile = $world->getTile($this->position);
+		if($tile instanceof TileCampfire && $tile->onUpdate()){
+			$world->addSound($this->position, new CampfireSound());
+		}
 	}
 }
