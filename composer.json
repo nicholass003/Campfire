@@ -1,0 +1,11 @@
+{
+    "name": "nicholass003/campfire",
+    "description": "A PocketMine-MP plugin implementing campfire functionality",
+    "type": "project",
+    "license": "LGPL-3.0",
+    "autoload": {
+        "psr-4": {
+            "nicholass003\\campfire\\": "/src"
+        }
+    }
+}
