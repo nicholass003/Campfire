@@ -50,8 +50,8 @@ class CampfireRegistry{
 	}
 
 	private static function registerCampfire() : void{
-		self::registerBlock(ExtraVanillaBlocks::CAMPFIRE(), [BlockTypeNames::CAMPFIRE]);
-		self::registerBlock(ExtraVanillaBlocks::SOUL_CAMPFIRE(), [BlockTypeNames::SOUL_CAMPFIRE]);
+		self::registerBlock(ExtraVanillaBlocks::CAMPFIRE(), ["campfire"]);
+		self::registerBlock(ExtraVanillaBlocks::SOUL_CAMPFIRE(), ["soul_campfire"]);
 	}
 
 	private static function mapBlockStateToObjectDeserializer() : void{

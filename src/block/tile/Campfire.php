@@ -30,26 +30,29 @@ use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\world\World;
+use function array_keys;
+use function count;
+use function in_array;
 
 class Campfire extends Spawnable{
 	use CampfireShelfTrait;
 
-    public const TAG_ITEMS = "CampfireItems"; //TAG_List
-    public const TAG_TIMES = "CampfireTimes"; //TAG_IntArray
+	public const TAG_ITEMS = "CampfireItems"; //TAG_List
+	public const TAG_TIMES = "CampfireTimes"; //TAG_IntArray
 
-    public const ITEM_SLOTS = [
-        "Item1",
-        "Item2",
-        "Item3",
-        "Item4"
-    ]; //TAG_Compound
+	public const ITEM_SLOTS = [
+		"Item1",
+		"Item2",
+		"Item3",
+		"Item4"
+	]; //TAG_Compound
 
-    public const ITEM_TIMES = [
-        "ItemTime1",
-        "ItemTime2",
-        "ItemTime3",
-        "ItemTime4"
-    ]; // TAG_Int
+	public const ITEM_TIMES = [
+		"ItemTime1",
+		"ItemTime2",
+		"ItemTime3",
+		"ItemTime4"
+	]; // TAG_Int
 
 	public const MAX_ITEMS = 4;
 
@@ -59,7 +62,7 @@ class Campfire extends Spawnable{
 	}
 
 	public function canCook(Item $item) : bool{
-		return in_array($item->getTypeId(), array_keys(CampfireFurnaceRecipe::RECIPES));
+		return in_array($item->getTypeId(), array_keys(CampfireFurnaceRecipe::RECIPES), true);
 	}
 
 	public function getItemCookQueue() : array{
@@ -116,7 +119,7 @@ class Campfire extends Spawnable{
 		}
 
 		$this->timings->startTiming();
-		
+
 		$res = false;
 
 		for($i = 0; $i < self::MAX_ITEMS; $i++){

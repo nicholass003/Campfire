@@ -25,14 +25,14 @@ declare(strict_types=1);
 namespace nicholass003\campfire\block\utils;
 
 trait ExtinguishTrait{
-    protected bool $extinguished = false;
+	protected bool $extinguished = false;
 
-    public function isExtinguished() : bool{
-        return $this->extinguished;
-    }
+	public function isExtinguished() : bool{
+		return $this->extinguished;
+	}
 
-    public function setExtinguished(bool $value) : self{
-        $this->extinguished = $value;
-        return $this;
-    }
+	public function setExtinguished(bool $value) : self{
+		$this->extinguished = $value;
+		return $this;
+	}
 }

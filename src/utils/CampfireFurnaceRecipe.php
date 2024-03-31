@@ -31,35 +31,35 @@ use pocketmine\item\StringToItemParser;
 
 class CampfireFurnaceRecipe{
 
-    public const DROPS = [
-        ItemTypeIds::RAW_BEEF => ItemTypeNames::BEEF,
-        ItemTypeIds::RAW_CHICKEN => ItemTypeNames::CHICKEN,
-        ItemTypeIds::RAW_RABBIT => ItemTypeNames::RABBIT,
-        ItemTypeIds::RAW_PORKCHOP => ItemTypeNames::PORKCHOP,
-        ItemTypeIds::RAW_MUTTON => ItemTypeNames::MUTTON,
-        ItemTypeIds::RAW_FISH => ItemTypeNames::TROPICAL_FISH,
-        ItemTypeIds::RAW_SALMON => ItemTypeNames::SALMON,
-        ItemTypeIds::POTATO => ItemTypeNames::POTATO
-    ];
+	public const DROPS = [
+		ItemTypeIds::RAW_BEEF => ItemTypeNames::BEEF,
+		ItemTypeIds::RAW_CHICKEN => ItemTypeNames::CHICKEN,
+		ItemTypeIds::RAW_RABBIT => ItemTypeNames::RABBIT,
+		ItemTypeIds::RAW_PORKCHOP => ItemTypeNames::PORKCHOP,
+		ItemTypeIds::RAW_MUTTON => ItemTypeNames::MUTTON,
+		ItemTypeIds::RAW_FISH => ItemTypeNames::TROPICAL_FISH,
+		ItemTypeIds::RAW_SALMON => ItemTypeNames::SALMON,
+		ItemTypeIds::POTATO => ItemTypeNames::POTATO
+	];
 
-    public const RECIPES = [
-        ItemTypeIds::RAW_BEEF => ItemTypeNames::COOKED_BEEF,
-        ItemTypeIds::RAW_CHICKEN => ItemTypeNames::COOKED_CHICKEN,
-        ItemTypeIds::RAW_RABBIT => ItemTypeNames::COOKED_RABBIT,
-        ItemTypeIds::RAW_PORKCHOP => ItemTypeNames::COOKED_PORKCHOP,
-        ItemTypeIds::RAW_MUTTON => ItemTypeNames::COOKED_MUTTON,
-        ItemTypeIds::RAW_FISH => ItemTypeNames::COOKED_COD,
-        ItemTypeIds::RAW_SALMON => ItemTypeNames::COOKED_SALMON,
-        ItemTypeIds::POTATO => ItemTypeNames::BAKED_POTATO
-    ];
+	public const RECIPES = [
+		ItemTypeIds::RAW_BEEF => ItemTypeNames::COOKED_BEEF,
+		ItemTypeIds::RAW_CHICKEN => ItemTypeNames::COOKED_CHICKEN,
+		ItemTypeIds::RAW_RABBIT => ItemTypeNames::COOKED_RABBIT,
+		ItemTypeIds::RAW_PORKCHOP => ItemTypeNames::COOKED_PORKCHOP,
+		ItemTypeIds::RAW_MUTTON => ItemTypeNames::COOKED_MUTTON,
+		ItemTypeIds::RAW_FISH => ItemTypeNames::COOKED_COD,
+		ItemTypeIds::RAW_SALMON => ItemTypeNames::COOKED_SALMON,
+		ItemTypeIds::POTATO => ItemTypeNames::BAKED_POTATO
+	];
 
-    public static function matchItemDrop(int $itemTypeId) : ?Item{
-        if($itemTypeId === 0) return null;
-        return StringToItemParser::getInstance()->parse(self::DROPS[$itemTypeId]);
-    }
+	public static function matchItemDrop(int $itemTypeId) : ?Item{
+		if($itemTypeId === 0) return null;
+		return StringToItemParser::getInstance()->parse(self::DROPS[$itemTypeId]);
+	}
 
-    public static function matchItemOutput(int $itemTypeId) : ?Item{
-        if($itemTypeId === 0) return null;
-        return StringToItemParser::getInstance()->parse(self::RECIPES[$itemTypeId]);
-    }
+	public static function matchItemOutput(int $itemTypeId) : ?Item{
+		if($itemTypeId === 0) return null;
+		return StringToItemParser::getInstance()->parse(self::RECIPES[$itemTypeId]);
+	}
 }

@@ -26,7 +26,7 @@ namespace nicholass003\campfire\block;
 
 class SoulCampfire extends Campfire{
 
-    public function getLightLevel() : int{
-        return $this->extinguished ? 0 : 10;
-    }
+	public function getLightLevel() : int{
+		return $this->extinguished ? 0 : 10;
+	}
 }
