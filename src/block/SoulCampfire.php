@@ -22,29 +22,11 @@
 
 declare(strict_types=1);
 
-namespace nicholass003\campfire;
+namespace nicholass003\campfire\block;
 
-use nicholass003\campfire\utils\CampfireRegistry;
-use pocketmine\plugin\PluginBase;
-use pocketmine\scheduler\AsyncTask;
-use pocketmine\utils\SingletonTrait;
+class SoulCampfire extends Campfire{
 
-class Loader extends PluginBase{
-	use SingletonTrait;
-
-	protected function onLoad() : void{
-		CampfireRegistry::register();
-	}
-
-	protected function onEnable() : void{
-		self::setInstance($this);
-
-		$this->getServer()->getAsyncPool()->addWorkerStartHook(function(int $worker) : void{
-			$this->getServer()->getAsyncPool()->submitTaskToWorker(new class extends AsyncTask{
-				public function onRun() : void{
-					CampfireRegistry::register();
-				}
-			}, $worker);
-		});
-	}
+    public function getLightLevel() : int{
+        return $this->extinguished ? 0 : 10;
+    }
 }

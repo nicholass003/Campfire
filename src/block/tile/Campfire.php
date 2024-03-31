@@ -27,7 +27,9 @@ namespace nicholass003\campfire\block\tile;
 use nicholass003\campfire\utils\CampfireFurnaceRecipe;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\item\Item;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\world\World;
 
 class Campfire extends Spawnable{
 	use CampfireShelfTrait;
@@ -50,6 +52,11 @@ class Campfire extends Spawnable{
     ]; // TAG_Int
 
 	public const MAX_ITEMS = 4;
+
+	public function __construct(World $world, Vector3 $pos){
+		parent::__construct($world, $pos);
+		$world->scheduleDelayedBlockUpdate($pos, 1);
+	}
 
 	public function canCook(Item $item) : bool{
 		return in_array($item->getTypeId(), array_keys(CampfireFurnaceRecipe::RECIPES));
@@ -76,6 +83,8 @@ class Campfire extends Spawnable{
 			$nbt = $this->saveNBT();
 			$nbt->removeTag(self::ITEM_SLOTS[$index]);
 			$nbt->removeTag(self::ITEM_TIMES[$index]);
+			$nbt->removeTag(self::TAG_ITEMS);
+			$nbt->removeTag(self::TAG_TIMES);
 			unset($this->items[$index]);
 			unset($this->times[$index]);
 		}

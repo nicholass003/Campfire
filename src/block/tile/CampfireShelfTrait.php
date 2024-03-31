@@ -73,6 +73,9 @@ trait CampfireShelfTrait{
         $items = [];
         $times = [];
         foreach($this->items as $index => $item){
+            if($item === null){
+                continue;
+            }
             $items[] = $item->nbtSerialize($index);
             $tag->setTag(Campfire::ITEM_SLOTS[$index], $item->nbtSerialize());
         }

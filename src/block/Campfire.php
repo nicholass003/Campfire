@@ -32,6 +32,7 @@ use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockTypeInfo;
 use pocketmine\block\Transparent;
 use pocketmine\block\utils\FacesOppositePlacingPlayerTrait;
+use pocketmine\block\utils\HorizontalFacingTrait;
 use pocketmine\data\runtime\RuntimeDataDescriber;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
@@ -40,6 +41,7 @@ use pocketmine\world\sound\ItemFrameAddItemSound;
 
 class Campfire extends Transparent{
 	use FacesOppositePlacingPlayerTrait;
+	use HorizontalFacingTrait;
 	use ExtinguishTrait;
 
 	public function __construct(BlockIdentifier $idInfo, string $name, BlockTypeInfo $typeInfo){
@@ -52,12 +54,13 @@ class Campfire extends Transparent{
 	}
 
 	public function getLightLevel() : int{
-		return $this->extinguished ? 15 : 0;
+		return $this->extinguished ? 0 : 15;
 	}
 
-	public function getDrops(Item $item) : array{
+	public function getDropsForCompatibleTool(Item $item) : array{
 		$tile = $this->position->getWorld()->getTile($this->position);
 		$drops = [];
+		$drops[] = ExtraVanillaBlocks::CAMPFIRE()->asItem();
 		if($tile instanceof TileCampfire){
 			foreach($tile->getItemCookQueue() as $slot => $id){
 				$item = CampfireFurnaceRecipe::matchItemDrop($id);
@@ -70,15 +73,19 @@ class Campfire extends Transparent{
 	}
 
 	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null, array &$returnedItems = []) : bool{
-		$tile = $this->position->getWorld()->getTile($this->position);
+		$world = $this->position->getWorld();
+		$tile = $world->getTile($this->position);
 		if($tile instanceof TileCampfire){
 			if($tile->canCook($item)){
-				$cook = $tile->addItemCookQueue($item);
-				if($cook === false){
-					return false;
+				if($tile->addItemCookQueue($item)){
+					$item->pop();
+					$this->position->getWorld()->addSound($clickVector, new ItemFrameAddItemSound());
+					$world->scheduleDelayedBlockUpdate($this->position, 1);
+					$block = $world->getBlock($this->position);
+					if($block instanceof Campfire){
+						$world->setBlock($this->position, $block);
+					}
 				}
-				$item->pop();
-				$this->position->getWorld()->addSound($clickVector, new ItemFrameAddItemSound());
 			}
 		}
 		return true;
@@ -89,6 +96,7 @@ class Campfire extends Transparent{
 		$tile = $world->getTile($this->position);
 		if($tile instanceof TileCampfire && $tile->onUpdate()){
 			$world->addSound($this->position, new CampfireSound());
+			$world->scheduleDelayedBlockUpdate($this->position, 1);
 		}
 	}
 }

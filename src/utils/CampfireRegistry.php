@@ -26,8 +26,8 @@ namespace nicholass003\campfire\utils;
 
 use nicholass003\campfire\block\Campfire;
 use nicholass003\campfire\block\ExtraVanillaBlocks;
+use nicholass003\campfire\block\SoulCampfire;
 use nicholass003\campfire\block\tile\Campfire as TileCampfire;
-use pocketmine\block\Block;
 use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\tile\TileFactory;
 use pocketmine\data\bedrock\block\BlockStateNames;
@@ -50,12 +50,18 @@ class CampfireRegistry{
 	}
 
 	private static function registerCampfire() : void{
-		self::registerBlock(ExtraVanillaBlocks::CAMPFIRE(), [BlockTypeNames::CAMPFIRE . "_block"]);
+		self::registerBlock(ExtraVanillaBlocks::CAMPFIRE(), [BlockTypeNames::CAMPFIRE]);
+		self::registerBlock(ExtraVanillaBlocks::SOUL_CAMPFIRE(), [BlockTypeNames::SOUL_CAMPFIRE]);
 	}
 
 	private static function mapBlockStateToObjectDeserializer() : void{
 		GlobalBlockStateHandlers::getDeserializer()->map(BlockTypeNames::CAMPFIRE, function(BlockStateReader $in) : Campfire{
 			return ExtraVanillaBlocks::CAMPFIRE()
+					->setFacing($in->readCardinalHorizontalFacing())
+					->setExtinguished($in->readBool(BlockStateNames::EXTINGUISHED));
+		});
+		GlobalBlockStateHandlers::getDeserializer()->map(BlockTypeNames::SOUL_CAMPFIRE, function(BlockStateReader $in) : SoulCampfire{
+			return ExtraVanillaBlocks::SOUL_CAMPFIRE()
 					->setFacing($in->readCardinalHorizontalFacing())
 					->setExtinguished($in->readBool(BlockStateNames::EXTINGUISHED));
 		});
@@ -65,9 +71,12 @@ class CampfireRegistry{
 		GlobalBlockStateHandlers::getSerializer()->map(ExtraVanillaBlocks::CAMPFIRE(),
 			fn(Campfire $block) => self::encodeCampfire($block, BlockStateWriter::create(BlockTypeNames::CAMPFIRE))
 		);
+		GlobalBlockStateHandlers::getSerializer()->map(ExtraVanillaBlocks::SOUL_CAMPFIRE(),
+			fn(SoulCampfire $block) => self::encodeCampfire($block, BlockStateWriter::create(BlockTypeNames::SOUL_CAMPFIRE))
+		);
 	}
 
-	private static function encodeCampfire(Campfire $block, BlockStateWriter $out) : BlockStateWriter{
+	private static function encodeCampfire(Campfire|SoulCampfire $block, BlockStateWriter $out) : BlockStateWriter{
 		return $out
 			->writeCardinalHorizontalFacing($block->getFacing())
 			->writeBool(BlockStateNames::EXTINGUISHED, $block->isExtinguished());
@@ -75,10 +84,10 @@ class CampfireRegistry{
 
 	private static function registerTile() : void{
 		$tileFactory = TileFactory::getInstance();
-		$tileFactory->register(TileCampfire::class, ["Campfire"]);
+		$tileFactory->register(TileCampfire::class, ["Campfire", "minecraft:campfire"]);
 	}
 
-	private static function registerBlock(Campfire $block, array $stringToItemParserNames) : void{
+	private static function registerBlock(Campfire|SoulCampfire $block, array $stringToItemParserNames) : void{
 		RuntimeBlockStateRegistry::getInstance()->register($block);
 		foreach($stringToItemParserNames as $name){
 			StringToItemParser::getInstance()->registerBlock($name, fn() => clone $block);
