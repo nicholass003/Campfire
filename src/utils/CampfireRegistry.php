@@ -28,15 +28,19 @@ use nicholass003\campfire\block\Campfire;
 use nicholass003\campfire\block\ExtraVanillaBlocks;
 use nicholass003\campfire\block\SoulCampfire;
 use nicholass003\campfire\block\tile\Campfire as TileCampfire;
+use pocketmine\block\Block;
 use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\tile\TileFactory;
 use pocketmine\data\bedrock\block\BlockStateNames;
 use pocketmine\data\bedrock\block\BlockTypeNames;
 use pocketmine\data\bedrock\block\convert\BlockStateReader;
 use pocketmine\data\bedrock\block\convert\BlockStateWriter;
+use pocketmine\data\bedrock\item\ItemTypeNames;
+use pocketmine\data\bedrock\item\SavedItemData;
 use pocketmine\inventory\CreativeInventory;
 use pocketmine\item\StringToItemParser;
 use pocketmine\world\format\io\GlobalBlockStateHandlers;
+use pocketmine\world\format\io\GlobalItemDataHandlers;
 
 class CampfireRegistry{
 
@@ -47,6 +51,7 @@ class CampfireRegistry{
 		self::mapBlockStateToObjectDeserializer();
 		self::mapBlockObjectToStateSerializer();
 		self::registerTile();
+		self::register1to1BlockMappings();
 	}
 
 	private static function registerCampfire() : void{
@@ -93,5 +98,15 @@ class CampfireRegistry{
 			StringToItemParser::getInstance()->registerBlock($name, fn() => clone $block);
 		}
 		CreativeInventory::getInstance()->add($block->asItem());
+	}
+
+	private static function register1to1BlockMappings() : void{
+		self::map1to1Block(ItemTypeNames::CAMPFIRE, ExtraVanillaBlocks::CAMPFIRE());
+		self::map1to1Block(ItemTypeNames::SOUL_CAMPFIRE, ExtraVanillaBlocks::SOUL_CAMPFIRE());
+	}
+
+	private static function map1to1Block(string $id, Block $block) : void{
+		GlobalItemDataHandlers::getDeserializer()->mapBlock($id, fn() => $block);
+		GlobalItemDataHandlers::getSerializer()->mapBlock($block, fn() => new SavedItemData($id));
 	}
 }
