@@ -60,7 +60,7 @@ class Campfire extends Transparent{
 	public function getDropsForCompatibleTool(Item $item) : array{
 		$tile = $this->position->getWorld()->getTile($this->position);
 		$drops = [];
-		$drops[] = ExtraVanillaBlocks::CAMPFIRE()->asItem();
+		$drops[] = $this->asItem();
 		if($tile instanceof TileCampfire){
 			foreach($tile->getItemCookQueue() as $slot => $id){
 				$item = CampfireFurnaceRecipe::matchItemDrop($id);
