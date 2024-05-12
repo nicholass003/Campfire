@@ -28,7 +28,7 @@ trait ExtinguishTrait{
 	protected bool $extinguished = false;
 
 	public function isExtinguished() : bool{
-		return $this->extinguished;
+		return $this->extinguished === true;
 	}
 
 	public function setExtinguished(bool $value) : self{
