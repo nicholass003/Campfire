@@ -26,8 +26,8 @@ namespace nicholass003\campfire\block;
 
 use nicholass003\campfire\block\tile\Campfire as TileCampfire;
 use nicholass003\campfire\block\utils\ExtinguishTrait;
-use nicholass003\campfire\sound\CampfireSound;
 use nicholass003\campfire\utils\CampfireFurnaceRecipe;
+use nicholass003\campfire\utils\CampfireFurnaceType;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockTypeInfo;
 use pocketmine\block\Transparent;
@@ -95,7 +95,7 @@ class Campfire extends Transparent{
 		$world = $this->position->getWorld();
 		$tile = $world->getTile($this->position);
 		if($tile instanceof TileCampfire && $tile->onUpdate()){
-			$world->addSound($this->position, new CampfireSound());
+			$world->addSound($this->position, CampfireFurnaceType::getCookSound());
 			$world->scheduleDelayedBlockUpdate($this->position, 1);
 		}
 	}

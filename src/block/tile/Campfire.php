@@ -25,6 +25,7 @@ declare(strict_types=1);
 namespace nicholass003\campfire\block\tile;
 
 use nicholass003\campfire\utils\CampfireFurnaceRecipe;
+use nicholass003\campfire\utils\CampfireFurnaceType;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
@@ -97,7 +98,7 @@ class Campfire extends Spawnable{
 		if(count($this->items) < self::MAX_ITEMS){
 			$index = count($this->items);
 			$this->items[$index] = $item;
-			$this->times[$index] = 600;
+			$this->times[$index] = CampfireFurnaceType::getCookDurationTicks();
 			return true;
 		}
 		return false;
