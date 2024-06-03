@@ -24,32 +24,31 @@ declare(strict_types=1);
 
 namespace nicholass003\campfire;
 
+use nicholass003\campfire\block\Campfire;
+use nicholass003\campfire\block\tile\Campfire as TileCampfire;
 use nicholass003\campfire\utils\CampfireFurnaceRecipeHandler;
-use nicholass003\campfire\utils\CampfireRegistry;
-use pocketmine\plugin\PluginBase;
-use pocketmine\scheduler\AsyncTask;
-use pocketmine\utils\SingletonTrait;
-use Symfony\Component\Filesystem\Path;
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerLoginEvent;
+use function var_dump;
 
-class Loader extends PluginBase{
-	use SingletonTrait;
+class EventListener implements Listener{
 
-	protected function onLoad() : void{
-		CampfireRegistry::register();
+	public function onPlayerLogin(PlayerLoginEvent $event) : void{
+		$player = $event->getPlayer();
+		if(!$event->isCancelled()){
+			$player->getNetworkSession()->sendDataPacket(CampfireFurnaceRecipeHandler::getInstance()->getCache());
+		}
 	}
 
-	protected function onEnable() : void{
-		self::setInstance($this);
-
-		$this->getServer()->getAsyncPool()->addWorkerStartHook(function(int $worker) : void{
-			$this->getServer()->getAsyncPool()->submitTaskToWorker(new class extends AsyncTask{
-				public function onRun() : void{
-					CampfireRegistry::register();
-				}
-			}, $worker);
-		});
-
-		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
-		CampfireFurnaceRecipeHandler::getInstance()->makeCampfireFurnaceRecipe(Path::join(\pocketmine\BEDROCK_DATA_PATH, "recipes"));
+	public function onPlayerInteract(PlayerInteractEvent $event) : void{
+		$player = $event->getPlayer();
+		$block = $event->getBlock();
+		if($block instanceof Campfire){
+			$tile = $player->getWorld()->getTile($block->getPosition());
+			if($tile instanceof TileCampfire){
+				var_dump($tile->saveNBT());
+			}
+		}
 	}
 }

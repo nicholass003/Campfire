@@ -24,112 +24,64 @@ declare(strict_types=1);
 
 namespace nicholass003\campfire\block\tile;
 
-use nicholass003\campfire\utils\CampfireFurnaceRecipe;
-use nicholass003\campfire\utils\CampfireFurnaceType;
+use nicholass003\campfire\block\Campfire as BlockCampfire;
+use nicholass003\campfire\block\inventory\CampfireInventory;
+use pocketmine\block\tile\Container;
+use pocketmine\block\tile\ContainerTrait;
 use pocketmine\block\tile\Spawnable;
-use pocketmine\item\Item;
+use pocketmine\inventory\CallbackInventoryListener;
+use pocketmine\inventory\Inventory;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\world\World;
-use function array_keys;
-use function count;
-use function in_array;
 
-class Campfire extends Spawnable{
+class Campfire extends Spawnable implements Container{
+	use ContainerTrait;
 	use CampfireShelfTrait;
-
-	public const TAG_ITEMS = "CampfireItems"; //TAG_List
-	public const TAG_TIMES = "CampfireTimes"; //TAG_IntArray
-
-	public const ITEM_SLOTS = [
-		"Item1",
-		"Item2",
-		"Item3",
-		"Item4"
-	]; //TAG_Compound
-
-	public const ITEM_TIMES = [
-		"ItemTime1",
-		"ItemTime2",
-		"ItemTime3",
-		"ItemTime4"
-	]; // TAG_Int
-
-	public const MAX_ITEMS = 4;
 
 	public function __construct(World $world, Vector3 $pos){
 		parent::__construct($world, $pos);
-		$world->scheduleDelayedBlockUpdate($pos, 1);
-	}
-
-	public function canCook(Item $item) : bool{
-		return in_array($item->getTypeId(), array_keys(CampfireFurnaceRecipe::RECIPES), true);
-	}
-
-	public function getItemCookQueue() : array{
-		return $this->items;
-	}
-
-	public function getItemCookResult(int $index) : ?Item{
-		$result = CampfireFurnaceRecipe::matchItemOutput($this->items[$index] instanceof Item ? $this->items[$index]->getTypeId() : 0);
-		return $result;
-	}
-
-	public function updateCookTime(int $index) : void{
-		$this->times[$index] -= 1;
-		if($this->times[$index] <= 0){
-			$world = $this->position->getWorld();
-			$result = $this->getItemCookResult($index);
-			if($result === null){
-				return;
+		$this->inventory = new CampfireInventory($this->position);
+		$this->inventory->getListeners()->add(CallbackInventoryListener::onAnyChange(
+			static function(Inventory $unused) use($world, $pos) : void{
+				$block = $world->getBlock($pos);
+				if($block instanceof BlockCampfire){
+					$world->setBlock($pos, $block);
+				}
 			}
-			$world->dropItem($this->position->add(0, 1, 0), $result);
-			$nbt = $this->saveNBT();
-			$nbt->removeTag(self::ITEM_SLOTS[$index]);
-			$nbt->removeTag(self::ITEM_TIMES[$index]);
-			$nbt->removeTag(self::TAG_ITEMS);
-			$nbt->removeTag(self::TAG_TIMES);
-			unset($this->items[$index]);
-			unset($this->times[$index]);
-		}
+		));
 	}
 
-	public function addItemCookQueue(Item $item) : bool{
-		if(count($this->items) < self::MAX_ITEMS){
-			$index = count($this->items);
-			$this->items[$index] = $item;
-			$this->times[$index] = CampfireFurnaceType::getCookDurationTicks();
-			return true;
-		}
-		return false;
+	public function getInventory() : Inventory{
+		return $this->inventory;
 	}
 
-	protected function addAdditionalSpawnData(CompoundTag $nbt) : void{}
+	public function getRealInventory() : Inventory{
+		return $this->inventory;
+	}
+
+	public function getCookingTimes() : array{
+		return $this->cookingTimes;
+	}
+
+	public function setCookingTimes(array $cookingTimes) : void{
+		$this->cookingTimes = $cookingTimes;
+	}
 
 	public function readSaveData(CompoundTag $nbt) : void{
-		$this->loadItems($nbt);
+		$this->readData($nbt);
 	}
 
 	protected function writeSaveData(CompoundTag $nbt) : void{
-		$this->saveItems($nbt);
+		$this->writeData($nbt);
 	}
 
-	public function onUpdate() : bool{
-		if($this->closed){
-			return false;
-		}
-
-		$this->timings->startTiming();
-
-		$res = false;
-
-		for($i = 0; $i < self::MAX_ITEMS; $i++){
-			if(isset($this->times[$i]) && isset($this->items[$i])){
-				$this->updateCookTime($i);
-				$res = true;
+	protected function addAdditionalSpawnData(CompoundTag $nbt) : void{
+		for($slot = 1; $slot <= self::MAX_ITEMS; $slot++){
+			$item = $this->inventory->getItem($slot - 1);
+			if(!$item->isNull()){
+				$nbt->setTag(self::ITEM_SLOTS . $slot, $item->nbtSerialize());
 			}
 		}
-		$this->timings->stopTiming();
-		return $res;
 	}
 }

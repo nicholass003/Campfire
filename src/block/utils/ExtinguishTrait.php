@@ -24,6 +24,11 @@ declare(strict_types=1);
 
 namespace nicholass003\campfire\block\utils;
 
+use nicholass003\campfire\block\Campfire;
+use pocketmine\world\Position;
+use pocketmine\world\sound\FireExtinguishSound;
+use pocketmine\world\sound\FlintSteelSound;
+
 trait ExtinguishTrait{
 	protected bool $extinguished = false;
 
@@ -34,5 +39,23 @@ trait ExtinguishTrait{
 	public function setExtinguished(bool $value) : self{
 		$this->extinguished = $value;
 		return $this;
+	}
+
+	public function extinguish(Position $pos) : void{
+		$pos->getWorld()->addSound($pos, new FireExtinguishSound());
+		$campfire = $pos->getWorld()->getBlock($pos);
+		if(!$campfire instanceof Campfire){
+			return;
+		}
+		$pos->getWorld()->setBlock($pos, $campfire->setExtinguished(false));
+	}
+
+	public function fire(Position $pos) : void{
+		$pos->getWorld()->addSound($pos, new FlintSteelSound());
+		$campfire = $pos->getWorld()->getBlock($pos);
+		if(!$campfire instanceof Campfire){
+			return;
+		}
+		$pos->getWorld()->setBlock($pos, $campfire->setExtinguished(true));
 	}
 }

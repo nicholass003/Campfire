@@ -24,66 +24,52 @@ declare(strict_types=1);
 
 namespace nicholass003\campfire\block\tile;
 
-use Exception;
-use pocketmine\data\bedrock\item\SavedItemStackData;
-use pocketmine\data\SavedDataLoadingException;
+use nicholass003\campfire\block\inventory\CampfireInventory;
 use pocketmine\item\Item;
-use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntArrayTag;
-use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\tag\IntTag;
 
 trait CampfireShelfTrait{
 
-	/** @var Item[] */
-	private array $items = [];
-	/** @var int[] */
-	private array $times = [];
+	/** @var array<int, int> */
+	private array $cookingTimes = [];
 
-	protected function loadItems(CompoundTag $tag) : void{
-		/** @var ListTag $itemsTag */
-		if(($itemsTag = $tag->getTag(Campfire::TAG_ITEMS)) instanceof ListTag && $itemsTag->getTagType() === NBT::TAG_Compound){
+	public const ITEM_SLOTS = "Item"; //TAG_Compound
+	public const ITEM_TIMES = "ItemTime"; // TAG_Int
 
-			$newItems = [];
-			/** @var CompoundTag $itemNBT */
-			foreach($itemsTag as $itemNBT){
-				try{
-					$newItems[$itemNBT->getByte(SavedItemStackData::TAG_SLOT)] = Item::nbtDeserialize($itemNBT);
-				}catch(SavedDataLoadingException $e){
-					\GlobalLogger::get()->logException($e);
-					continue;
-				}
+	public const MAX_ITEMS = 4;
+
+	protected CampfireInventory $inventory;
+
+	protected function readData(CompoundTag $nbt) : void{
+		$items = [];
+		$listeners = $this->inventory->getListeners()->toArray();
+		$this->inventory->getListeners()->remove(...$listeners);
+
+		for($slot = 1; $slot <= self::MAX_ITEMS; $slot++){
+			if(($tag = $nbt->getTag(self::ITEM_SLOTS . $slot)) instanceof CompoundTag){
+				$items[$slot - 1] = Item::nbtDeserialize($tag);
 			}
-			$this->items = $newItems;
-		}
-		/** @var IntArrayTag $timesTag */
-		if(($timesTag = $tag->getTag(Campfire::TAG_TIMES)) instanceof IntArrayTag){
-
-			$newTimes = [];
-			try{
-				$newTimes = $timesTag->getValue();
-			}catch(Exception $e){
-				\GlobalLogger::get()->logException($e);
+			if(($tag = $nbt->getTag(self::ITEM_TIMES . $slot)) instanceof IntTag){
+				$this->cookingTimes[$slot - 1] = $tag->getValue();
 			}
-			$this->times = $newTimes;
 		}
+
+		$this->inventory->setContents($items);
+		$this->inventory->getListeners()->add(...$listeners);
 	}
 
-	protected function saveItems(CompoundTag $tag) : void{
-		$items = [];
-		$times = [];
-		foreach($this->items as $index => $item){
-			if($item === null){
-				continue;
+	protected function writeData(CompoundTag $nbt) : void{
+		for($slot = 1; $slot <= self::MAX_ITEMS; $slot++){
+			$item = $this->inventory->getItem($slot - 1);
+			if(!$item->isNull()){
+				$nbt->setTag(self::ITEM_SLOTS . $slot, $item->nbtSerialize($slot));
 			}
-			$items[] = $item->nbtSerialize($index);
-			$tag->setTag(Campfire::ITEM_SLOTS[$index], $item->nbtSerialize());
+
+			$cookingTime = $this->cookingTimes[$slot - 1] ?? 0;
+			if($cookingTime !== 0){
+				$nbt->setInt(self::ITEM_TIMES . $slot, $cookingTime);
+			}
 		}
-		foreach($this->times as $index => $time){
-			$times[$index] = $time;
-			$tag->setInt(Campfire::ITEM_TIMES[$index], $time);
-		}
-		$tag->setTag(Campfire::TAG_ITEMS, new ListTag($items, NBT::TAG_Compound));
-		$tag->setTag(Campfire::TAG_TIMES, new IntArrayTag($times));
 	}
 }
