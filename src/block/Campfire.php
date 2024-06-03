@@ -54,6 +54,7 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\Limits;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\sound\ItemFrameAddItemSound;
 use function count;
 
 class Campfire extends Transparent{
@@ -158,17 +159,8 @@ class Campfire extends Transparent{
 				$ingredient = clone $item;
 				$ingredient->setCount(1);
 				if(count($this->inventory->addItem($ingredient)) === 0){
-					$index = null;
-					for($slot = 1; $slot <= TileCampfire::MAX_ITEMS; $slot++){
-						if($this->getCookingTime($slot - 1) === 0){
-							$index = $slot - 1;
-							break;
-						}
-					}
-					if($index !== null){
-						$this->setCookingTime($index, CampfireFurnaceType::getCookDurationTicks());
-					}
 					$item->pop();
+					$this->position->getWorld()->addSound($this->position, new ItemFrameAddItemSound());
 					return true;
 				}
 			}
@@ -207,14 +199,12 @@ class Campfire extends Transparent{
 		if(!$this->extinguished){
 			$items = $this->inventory->getContents();
 			foreach($items as $slot => $item){
+				$this->setCookingTime($slot, $this->getCookingTime($slot) + 20);
 				if($this->getCookingTime($slot) >= CampfireFurnaceType::getCookDurationTicks()){
 					$this->inventory->setItem($slot, VanillaItems::AIR());
 					$this->setCookingTime($slot, 0);
 					$result = ($recipe = CampfireFurnaceRecipeHandler::getInstance()->match($item)) instanceof FurnaceRecipe ? $recipe->getResult() : VanillaItems::AIR();
 					$world->dropItem($this->position->add(0, 1, 0), $result);
-				}
-				if(!$item->isNull() && $this->getCookingTime($slot) !== 0){
-					$this->setCookingTime($slot, $this->getCookingTime($slot) - 1);
 				}
 			}
 			if(count($items) > 0){

@@ -47,7 +47,8 @@ trait ExtinguishTrait{
 		if(!$campfire instanceof Campfire){
 			return;
 		}
-		$pos->getWorld()->setBlock($pos, $campfire->setExtinguished(false));
+		$pos->getWorld()->setBlock($pos, $campfire->setExtinguished(true));
+		$pos->getWorld()->scheduleDelayedBlockUpdate($pos, 20);
 	}
 
 	public function fire(Position $pos) : void{
@@ -56,6 +57,7 @@ trait ExtinguishTrait{
 		if(!$campfire instanceof Campfire){
 			return;
 		}
-		$pos->getWorld()->setBlock($pos, $campfire->setExtinguished(true));
+		$pos->getWorld()->setBlock($pos, $campfire->setExtinguished(false));
+		$pos->getWorld()->scheduleDelayedBlockUpdate($pos, 20);
 	}
 }

@@ -24,13 +24,9 @@ declare(strict_types=1);
 
 namespace nicholass003\campfire;
 
-use nicholass003\campfire\block\Campfire;
-use nicholass003\campfire\block\tile\Campfire as TileCampfire;
 use nicholass003\campfire\utils\CampfireFurnaceRecipeHandler;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerLoginEvent;
-use function var_dump;
 
 class EventListener implements Listener{
 
@@ -38,17 +34,6 @@ class EventListener implements Listener{
 		$player = $event->getPlayer();
 		if(!$event->isCancelled()){
 			$player->getNetworkSession()->sendDataPacket(CampfireFurnaceRecipeHandler::getInstance()->getCache());
-		}
-	}
-
-	public function onPlayerInteract(PlayerInteractEvent $event) : void{
-		$player = $event->getPlayer();
-		$block = $event->getBlock();
-		if($block instanceof Campfire){
-			$tile = $player->getWorld()->getTile($block->getPosition());
-			if($tile instanceof TileCampfire){
-				var_dump($tile->saveNBT());
-			}
 		}
 	}
 }

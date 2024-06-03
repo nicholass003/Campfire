@@ -39,6 +39,11 @@ class Campfire extends Spawnable implements Container{
 	use ContainerTrait;
 	use CampfireShelfTrait;
 
+	public const ITEM_SLOTS = "Item"; //TAG_Compound
+	public const ITEM_TIMES = "ItemTime"; // TAG_Int
+
+	public const MAX_ITEMS = 4;
+
 	public function __construct(World $world, Vector3 $pos){
 		parent::__construct($world, $pos);
 		$this->inventory = new CampfireInventory($this->position);

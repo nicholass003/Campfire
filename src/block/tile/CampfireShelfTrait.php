@@ -34,11 +34,6 @@ trait CampfireShelfTrait{
 	/** @var array<int, int> */
 	private array $cookingTimes = [];
 
-	public const ITEM_SLOTS = "Item"; //TAG_Compound
-	public const ITEM_TIMES = "ItemTime"; // TAG_Int
-
-	public const MAX_ITEMS = 4;
-
 	protected CampfireInventory $inventory;
 
 	protected function readData(CompoundTag $nbt) : void{
@@ -46,11 +41,11 @@ trait CampfireShelfTrait{
 		$listeners = $this->inventory->getListeners()->toArray();
 		$this->inventory->getListeners()->remove(...$listeners);
 
-		for($slot = 1; $slot <= self::MAX_ITEMS; $slot++){
-			if(($tag = $nbt->getTag(self::ITEM_SLOTS . $slot)) instanceof CompoundTag){
+		for($slot = 1; $slot <= Campfire::MAX_ITEMS; $slot++){
+			if(($tag = $nbt->getTag(Campfire::ITEM_SLOTS . $slot)) instanceof CompoundTag){
 				$items[$slot - 1] = Item::nbtDeserialize($tag);
 			}
-			if(($tag = $nbt->getTag(self::ITEM_TIMES . $slot)) instanceof IntTag){
+			if(($tag = $nbt->getTag(Campfire::ITEM_TIMES . $slot)) instanceof IntTag){
 				$this->cookingTimes[$slot - 1] = $tag->getValue();
 			}
 		}
@@ -60,15 +55,15 @@ trait CampfireShelfTrait{
 	}
 
 	protected function writeData(CompoundTag $nbt) : void{
-		for($slot = 1; $slot <= self::MAX_ITEMS; $slot++){
+		for($slot = 1; $slot <= Campfire::MAX_ITEMS; $slot++){
 			$item = $this->inventory->getItem($slot - 1);
 			if(!$item->isNull()){
-				$nbt->setTag(self::ITEM_SLOTS . $slot, $item->nbtSerialize($slot));
+				$nbt->setTag(Campfire::ITEM_SLOTS . $slot, $item->nbtSerialize($slot));
 			}
 
 			$cookingTime = $this->cookingTimes[$slot - 1] ?? 0;
 			if($cookingTime !== 0){
-				$nbt->setInt(self::ITEM_TIMES . $slot, $cookingTime);
+				$nbt->setInt(Campfire::ITEM_TIMES . $slot, $cookingTime);
 			}
 		}
 	}
