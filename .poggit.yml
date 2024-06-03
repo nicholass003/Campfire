@@ -5,4 +5,5 @@ branches:
 projects:
   Campfire:
     path: ""
+    icon: "assets/icon.png"
 ...
